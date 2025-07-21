@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
           } else {
             throw new Error("Password not set for this user");
           }
-
+          console.log("user", user);
           if (isPasswordCorrect) {
             return {
               id: user.id,
@@ -83,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       });
 
       if (!existingUser) {
+        // const newUser = await prisma.user.create({
         await prisma.user.create({
           data: {
             firstName: profile?.name?.split(" ")[0] || "User",
@@ -93,7 +94,37 @@ export const authOptions: NextAuthOptions = {
             image: profile?.image,
           },
         });
+        // user = {
+        //   ...user,
+        //   id: newUser.id,
+        //   firstName: newUser.firstName,
+        //   middleName: newUser.middleName || "",
+        //   lastName: newUser.lastName || "",
+        //   image: newUser.image || "",
+        //   email: newUser.email,
+        //   phone: newUser.phone || "",
+        //   isEmailVerified: newUser.isEmailVerified,
+        //   isPhoneVerified: newUser.isPhoneVerified,
+        //   role: newUser.role,
+        //   isActive: newUser.isActive,
+        // },
       }
+      // else {
+      //   user = {
+      //     ...user,
+      //     id: existingUser.id,
+      //     firstName: existingUser.firstName,
+      //     middleName: existingUser.middleName || "",
+      //     lastName: existingUser.lastName || "",
+      //     image: existingUser.image || "",
+      //     email: existingUser.email,
+      //     phone: existingUser.phone || "",
+      //     isEmailVerified: existingUser.isEmailVerified,
+      //     isPhoneVerified: existingUser.isPhoneVerified,
+      //     role: existingUser.role,
+      //     isActive: existingUser.isActive,
+      //   };
+      // }
 
       return true;
     },
@@ -114,17 +145,24 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user._id = token._id as string;
-      session.user.name = token.name;
+      session.user.id = token.id;
+      session.user.firstName = token.firstName;
+      session.user.middleName = token.middleName;
+      session.user.lastName = token.lastName;
+      session.user.image = token.image;
       session.user.email = token.email;
       session.user.phone = token.phone;
-      session.user.avatar = token.avatar;
+      session.user.isEmailVerified = token.isEmailVerified;
+      session.user.isPhoneVerified = token.isPhoneVerified;
+      session.user.isActive = token.isActive;
       session.user.role = token.role;
-      session.user.isVerified = token.isVerified;
+
       return session;
     },
   },
-  pages: { signIn: "/login" },
+  pages: {
+    signIn: "/login",
+  },
   session: { strategy: "jwt" },
   secret: process.env.NEXT_AUTH_SECRET,
 };
