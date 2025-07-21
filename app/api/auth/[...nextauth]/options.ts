@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
           } else {
             throw new Error("Password not set for this user");
           }
-          console.log("user", user);
+          // console.log("user", user);
           if (isPasswordCorrect) {
             return {
               id: user.id,
