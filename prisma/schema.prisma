@@ -56,3 +56,44 @@ model Profile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model Doctor {
+  id               String         @id @default(cuid())
+  userId           String         @unique @map("user_id")
+  specialty        String
+  experience       Int            @default(0) // Years of experience
+  location         String
+  city             String
+  state            String
+  country          String
+  pinCode          String?        @map("pin_code")
+  availability     String[]
+  availabilityTime String[]       @map("availability_time")
+  consultationFee  Int            @default(0)
+  languages        String[]       @map("languages")
+  education        String
+  DoctorRating     DoctorRating[]
+  isActive         Boolean        @default(true) @map("is_active")
+  isVerified       Boolean        @default(false) @map("is_verified")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now()) @updatedAt
+}
+
+model DoctorRating {
+  id        String   @id @default(cuid())
+  doctorId  String   @map("doctor_id")
+  patientId String   @map("patient_id")
+  rating    Int // Rating out of 5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model Patient {
+  id     String @id @default(cuid())
+  userId String @unique @map("user_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
