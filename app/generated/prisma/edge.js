@@ -258,7 +258,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/ashutoshgaurav/Public/devvoy/swasyn-test/swasyn/app/generated/prisma",
+      "value": "/Users/ashutoshgaurav/Public/devvoy/swasyn/swasyn/app/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -272,7 +272,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/ashutoshgaurav/Public/devvoy/swasyn-test/swasyn/prisma/schema.prisma",
+    "sourceFilePath": "/Users/ashutoshgaurav/Public/devvoy/swasyn/swasyn/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
