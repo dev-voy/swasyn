@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum Roll {
+  USER // Patient default user role
+  DOCTOR
+  HOSPITAL
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum AppointmentStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+  no_show
+  rescheduled
+}
+
+enum AppointmentType {
+  in_person // Default to in-person consultation
+  online // Virtual consultation
+  home_visit
+  follow_up
+  emergency
+  virtual
+}
+
+model User {
+  id              String    @id @default(cuid())
+  firstName       String    @map("first_name")
+  lastName        String?   @map("last_name")
+  middleName      String?   @map("middle_name")
+  image           String?
+  email           String    @unique
+  isEmailVerified Boolean   @default(false) @map("is_email_verified")
+  phone           String?   @unique
+  isPhoneVerified Boolean   @default(false) @map("is_phone_verified")
+  password        String?
+  gender          Gender    @default(other)
+  dateOfBirth     DateTime? @map("date_of_birth")
+  role            Roll      @default(USER) @map("user_role")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique @map("user_id")
+  bio       String?
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  pinCode   String?  @map("pin_code")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Doctor {
+  id               String         @id @default(cuid())
+  userId           String         @unique @map("user_id")
+  specialty        String
+  experience       Int            @default(0) // Years of experience
+  location         String
+  city             String
+  state            String
+  country          String
+  pinCode          String?        @map("pin_code")
+  availability     String[]
+  availabilityTime String[]       @map("availability_time")
+  consultationFee  Int            @default(0)
+  languages        String[]       @map("languages")
+  education        String
+  DoctorRating     DoctorRating[]
+  isActive         Boolean        @default(true) @map("is_active")
+  isVerified       Boolean        @default(false) @map("is_verified")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now()) @updatedAt
+  appointments     Appointment[]
+}
+
+model DoctorRating {
+  id        String   @id @default(cuid())
+  doctorId  Doctor   @relation(fields: [id], references: [id], onDelete: Cascade)
+  patientId String   @map("patient_id")
+  rating    Int // Rating out of 5
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model Patient {
+  patientId      String        @id @default(cuid()) @map("patient_id")
+  userId         String        @unique @map("user_id")
+  allergies      String[]      @map("allergies")
+  medicalHistory String?       @map("medical_history")
+  appointment    Appointment[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+}
+
+model Appointment {
+  appointmentId     String            @id @default(cuid()) @map("appointment_id")
+  patientId         Patient           @relation(fields: appointmentId, references: patientId, map: "patient_id")
+  doctorId          Doctor            @relation(fields: appointmentId, references: id, map: "doctor_id")
+  hospitalId        Hospital?         @relation(fields: appointmentId, references: id, map: "hospital_id")
+  appointmentDate   DateTime          @map("appointment_date")
+  appointmentTime   String            @map("appointment_time")
+  appointmentType   AppointmentType   @default(in_person) @map("appointment_type")
+  appointmentStatus AppointmentStatus @default(pending) @map("appointment_status")
+  symptoms          String?
+  prescription      String?
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now()) @updatedAt
+}
+
+model Hospital {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  hospitalURL String   @unique @map("hospital_url")
+  images      String[] @map("images")
+  services    String[] @map("services")
+  address     String
+  phone       String?  @unique
+  email       String?  @unique
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  isVerified  Boolean  @default(false) @map("is_verified")
+
+  adminsIds   String[]      @map("admins_ids")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  // Doctor      Doctor[]
+  Appointment Appointment[]
+}
