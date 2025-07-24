@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const appointmentSchema = z.object({
+const appointmentSchema = z.object({
   patientId: z.string().cuid2(),
   doctorId: z.string().cuid2(),
   hospitalId: z.string().optional(),
@@ -31,3 +31,21 @@ export const appointmentSchema = z.object({
   prescription: z.string().optional(),
   notes: z.string().optional(),
 });
+
+const appointmentReshuduleSchema = z.object({
+  appointmentId: z.string().cuid2(),
+  newAppointmentDate: z.string().datetime(),
+  newAppointmentTime: z.string().optional(),
+  newAppointmentType: z
+    .enum([
+      "in_person",
+      "online",
+      "home_visit",
+      "follow_up",
+      "emergency",
+      "virtual",
+    ])
+    .optional(),
+});
+
+export { appointmentSchema, appointmentReshuduleSchema };
